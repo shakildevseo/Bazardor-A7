@@ -1,4 +1,5 @@
 
+import { ToastProvider } from "@/components/ToastProvider";
 
 import "./globals.css";
 
@@ -8,7 +9,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
   
     >
-      <body>{children}</body>
+  <body >
+  <ToastProvider>{children}</ToastProvider>
+</body>
     </html>
   );
 }

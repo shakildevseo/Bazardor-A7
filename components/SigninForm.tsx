@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { getSafeReturnPath } from "@/lib/safe-return-path";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
+import { useToast } from "@/components/ToastProvider";
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error
@@ -12,8 +15,21 @@ function getErrorMessage(error: unknown): string {
 
 export default function SigninForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = getSafeReturnPath(searchParams.get("callbackUrl"));
+  const showToast = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(() =>
+    searchParams.get("socialError") === "signup-required"
+      ? "এই Google/GitHub অ্যাকাউন্টে এখনো সাইন আপ করা হয়নি। আগে সাইন আপ করুন।"
+      : "",
+  );
+
+  useEffect(() => {
+    if (searchParams.get("authRequired") === "1") {
+      showToast("এই পৃষ্ঠাটি দেখতে সাইন ইন করুন।", "error");
+    }
+  }, [searchParams, showToast]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -24,12 +40,16 @@ export default function SigninForm() {
     const password = String(formData.get("password") ?? "");
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMessage("সঠিক ইমেইল ঠিকানা লিখুন।");
+      const message = "সঠিক ইমেইল ঠিকানা লিখুন।";
+      setErrorMessage(message);
+      showToast(message, "error");
       return;
     }
 
     if (!password) {
-      setErrorMessage("পাসওয়ার্ড লিখুন।");
+      const message = "পাসওয়ার্ড লিখুন।";
+      setErrorMessage(message);
+      showToast(message, "error");
       return;
     }
 
@@ -39,18 +59,24 @@ export default function SigninForm() {
       const result = await authClient.signIn.email({
         email,
         password,
-        callbackURL: "/",
+        callbackURL: callbackUrl,
       });
 
       if (result.error) {
-        setErrorMessage(result.error.message ?? "ইমেইল বা পাসওয়ার্ড সঠিক নয়।");
+        const message =
+          result.error.message ?? "ইমেইল বা পাসওয়ার্ড সঠিক নয়।";
+        setErrorMessage(message);
+        showToast(message, "error");
         return;
       }
 
-      router.push("/");
+      showToast("সাইন ইন সফল হয়েছে।", "success");
+      router.push(callbackUrl);
       router.refresh();
     } catch (error) {
-      setErrorMessage(getErrorMessage(error));
+      const message = getErrorMessage(error);
+      setErrorMessage(message);
+      showToast(message, "error");
     } finally {
       setIsLoading(false);
     }
@@ -77,6 +103,7 @@ export default function SigninForm() {
           name="password"
           type="password"
           autoComplete="current-password"
+          placeholder="কমপক্ষে ৮ অক্ষর"
           required
           disabled={isLoading}
           className="mt-1.5 h-11 w-full rounded-lg border border-[#dce4dd] bg-[#fbfcfb] px-3 text-sm outline-none focus:border-[#14915b] focus:ring-2 focus:ring-[#14915b]/15 disabled:opacity-60"
@@ -92,10 +119,12 @@ export default function SigninForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="flex h-11 w-full items-center justify-center rounded-lg bg-[#078c4b] text-sm font-bold text-white transition hover:bg-[#067b42] disabled:cursor-wait disabled:opacity-70"
+        className="flex h-11 w-full cursor-pointer items-center justify-center rounded-lg bg-[#078c4b] text-sm font-bold text-white transition hover:bg-[#067b42] disabled:cursor-wait disabled:opacity-70"
       >
         {isLoading ? "অপেক্ষা করুন..." : "সাইন ইন করুন"}
       </button>
+
+      <SocialAuthButtons mode="signin" callbackURL={callbackUrl} />
     </form>
   );
 }

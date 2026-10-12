@@ -1,11 +1,12 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import SignupForm from "@/components/SignupForm";
+import PriceTicker from "@/components/PriceTicker";
 
 export default function SignupPage() {
   return (
     <div className="flex min-h-screen flex-col bg-[#edf3ee] text-[#202825]">
-      <Navbar />
+      <Navbar ticker={<PriceTicker />} />
 
       <main className="flex flex-1 flex-col items-center px-3 py-8">
         <header className="mb-4 text-center">
@@ -23,7 +24,7 @@ export default function SignupPage() {
           অ্যাকাউন্ট আছে?{" "}
           <Link
             href="/signin"
-            className="font-semibold text-[#0b9857] hover:underline"
+            className="cursor-pointer font-semibold text-[#0b9857] hover:underline"
           >
             সাইন ইন করুন
           </Link>

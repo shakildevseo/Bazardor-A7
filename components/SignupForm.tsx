@@ -3,6 +3,8 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
+import { useToast } from "@/components/ToastProvider";
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error
@@ -12,6 +14,7 @@ function getErrorMessage(error: unknown): string {
 
 export default function SignupForm() {
   const router = useRouter();
+  const showToast = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -26,19 +29,27 @@ export default function SignupForm() {
     const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
     if (name.length < 2) {
-      setErrorMessage("নাম অন্তত ২ অক্ষরের হতে হবে।");
+      const message = "নাম অন্তত ২ অক্ষরের হতে হবে।";
+      setErrorMessage(message);
+      showToast(message, "error");
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrorMessage("সঠিক ইমেইল ঠিকানা লিখুন।");
+      const message = "সঠিক ইমেইল ঠিকানা লিখুন।";
+      setErrorMessage(message);
+      showToast(message, "error");
       return;
     }
     if (password.length < 8) {
-      setErrorMessage("পাসওয়ার্ড অন্তত ৮ অক্ষরের হতে হবে।");
+      const message = "পাসওয়ার্ড অন্তত ৮ অক্ষরের হতে হবে।";
+      setErrorMessage(message);
+      showToast(message, "error");
       return;
     }
     if (password !== confirmPassword) {
-      setErrorMessage("দুটি পাসওয়ার্ড একই হতে হবে।");
+      const message = "দুটি পাসওয়ার্ড একই হতে হবে।";
+      setErrorMessage(message);
+      showToast(message, "error");
       return;
     }
 
@@ -52,14 +63,20 @@ export default function SignupForm() {
       });
 
       if (result.error) {
-        setErrorMessage(result.error.message ?? "অ্যাকাউন্ট তৈরি করা যায়নি।");
+        const message =
+          result.error.message ?? "অ্যাকাউন্ট তৈরি করা যায়নি।";
+        setErrorMessage(message);
+        showToast(message, "error");
         return;
       }
 
+      showToast("অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন সাইন ইন করুন।", "success");
       router.push("/signin");
       router.refresh();
     } catch (error) {
-      setErrorMessage(getErrorMessage(error));
+      const message = getErrorMessage(error);
+      setErrorMessage(message);
+      showToast(message, "error");
     } finally {
       setIsLoading(false);
     }
@@ -73,6 +90,7 @@ export default function SignupForm() {
           name="name"
           type="text"
           autoComplete="name"
+          placeholder="যেমন: রহিম উদ্দিন"
           minLength={2}
           required
           disabled={isLoading}
@@ -86,6 +104,7 @@ export default function SignupForm() {
           name="email"
           type="email"
           autoComplete="email"
+          placeholder="you@example.com"
           required
           disabled={isLoading}
           className="mt-1.5 h-11 w-full rounded-lg border border-[#dce4dd] bg-[#fbfcfb] px-3 text-sm outline-none focus:border-[#14915b] focus:ring-2 focus:ring-[#14915b]/15 disabled:opacity-60"
@@ -98,6 +117,7 @@ export default function SignupForm() {
           name="password"
           type="password"
           autoComplete="new-password"
+          placeholder="কমপক্ষে ৮ অক্ষর"
           minLength={8}
           required
           disabled={isLoading}
@@ -111,6 +131,7 @@ export default function SignupForm() {
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
+          placeholder="আবার লিখুন"
           required
           disabled={isLoading}
           className="mt-1.5 h-11 w-full rounded-lg border border-[#dce4dd] bg-[#fbfcfb] px-3 text-sm outline-none focus:border-[#14915b] focus:ring-2 focus:ring-[#14915b]/15 disabled:opacity-60"
@@ -126,10 +147,12 @@ export default function SignupForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="flex h-11 w-full items-center justify-center rounded-lg bg-[#078c4b] text-sm font-bold text-white transition hover:bg-[#067b42] disabled:cursor-wait disabled:opacity-70"
+        className="flex h-11 w-full cursor-pointer items-center justify-center rounded-lg bg-[#078c4b] text-sm font-bold text-white transition hover:bg-[#067b42] disabled:cursor-wait disabled:opacity-70"
       >
         {isLoading ? "অপেক্ষা করুন..." : "অ্যাকাউন্ট তৈরি করুন"}
       </button>
+
+      <SocialAuthButtons mode="signup" />
     </form>
   );
 }

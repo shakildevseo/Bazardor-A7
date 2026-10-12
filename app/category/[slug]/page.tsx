@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import CategoryProducts from "@/components/CategoryProducts";
 import Navbar from "@/components/Navbar";
+import PriceTicker from "@/components/PriceTicker";
 import {
   formatChangePercent,
   formatTaka,
@@ -71,6 +72,7 @@ async function CategoryPageContent({ params }: CategoryPageProps) {
         activeCategory={slug}
         navItems={navItems}
         dateLabel={dateLabel}
+        ticker={<PriceTicker />}
       />
 
       <main className="mx-auto w-full max-w-7xl px-3 pb-8 pt-5 sm:px-6">
@@ -93,6 +95,11 @@ async function CategoryPageContent({ params }: CategoryPageProps) {
 
         <CategoryProducts products={categoryProducts} />
       </main>
+
+      <footer className="flex flex-col gap-2 border-t border-[#dfe5df] bg-[#fbfcfb] px-3 py-5 text-xs leading-5 text-[#58615e] sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <p>বাজার দর — প্রয়োজনীয় পণ্যের দাম এক নজরে।</p>
+        <p>সকল দাম সম্ভাব্য; বাজার অবস্থার ওপর নির্ভর করে পরিবর্তিত হয়।</p>
+      </footer>
     </div>
   );
 }

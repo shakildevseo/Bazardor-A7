@@ -50,16 +50,30 @@ export default function CategoryProducts({
 
         <label className="flex items-center gap-2 text-sm text-[#68736e]">
           <span>সাজান:</span>
-          <select
-            value={sortBy}
-            onChange={(event) => setSortBy(event.target.value as SortOrder)}
-            className="min-h-10 rounded-lg border border-[#dce4dd] bg-[#fbfcfb] px-3 py-2 text-sm text-[#303a35] outline-none focus:border-[#168d5b] focus:ring-2 focus:ring-[#168d5b]/15"
-            aria-label="পণ্যের দাম অনুযায়ী সাজান"
-          >
-            <option value="default">ডিফল্ট</option>
-            <option value="price-low">দাম: কম থেকে বেশি</option>
-            <option value="price-high">দাম: বেশি থেকে কম</option>
-          </select>
+          <span className="relative">
+            <select
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value as SortOrder)}
+              className="min-h-10 appearance-none rounded-lg border border-[#dce4dd] bg-[#fbfcfb] py-2 pl-3 pr-9 text-sm text-[#303a35] outline-none focus:border-[#168d5b] focus:ring-2 focus:ring-[#168d5b]/15"
+              aria-label="পণ্যের দাম অনুযায়ী সাজান"
+            >
+              <option value="default">ডিফল্ট</option>
+              <option value="price-low">দাম: কম থেকে বেশি</option>
+              <option value="price-high">দাম: বেশি থেকে কম</option>
+            </select>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#68736e]"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.09 1.03l-4.25 4.5a.75.75 0 0 1-1.09 0l-4.25-4.5a.75.75 0 0 1 .02-1.06Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </span>
         </label>
       </div>
 

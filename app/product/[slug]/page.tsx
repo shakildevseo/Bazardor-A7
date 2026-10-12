@@ -1,8 +1,11 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { connection } from "next/server";
 import Navbar from "@/components/Navbar";
+import PriceTicker from "@/components/PriceTicker";
 import {
   formatChangePercent,
   formatTaka,
@@ -10,6 +13,7 @@ import {
   getProductBySlug,
   getUnitLabel,
 } from "@/lib/bazardor";
+import { auth } from "@/lib/auth";
 import type { BazaarProduct } from "@/lib/bazardor";
 
 type ProductDetailPageProps = {
@@ -36,6 +40,15 @@ async function ProductDetailContent({
 
   if (!product) {
     notFound();
+  }
+
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    const callbackUrl = `/product/${encodeURIComponent(slug)}`;
+    redirect(
+      `/signin?callbackUrl=${encodeURIComponent(callbackUrl)}&authRequired=1`,
+    );
   }
 
   const dateLabel = getBangladeshDateLabel();
@@ -69,7 +82,7 @@ async function ProductDetailContent({
 
   return (
     <div className="flex min-h-screen flex-col bg-[#edf3ee] text-[#202825]">
-      <Navbar dateLabel={dateLabel} />
+      <Navbar dateLabel={dateLabel} ticker={<PriceTicker />} />
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-3 pb-8 pt-5 sm:px-6">
         <ProductBreadcrumb product={product} />
@@ -217,8 +230,9 @@ async function ProductDetailContent({
         </section>
       </main>
 
-      <footer className="border-t border-[#e1e8e1] bg-[#fbfcfb] px-3 py-4 text-center text-xs text-[#58615e]">
-        বাজার দর — প্রয়োজনীয় পণ্যের দাম এক নজরে।
+      <footer className="flex flex-col gap-2 border-t border-[#e1e8e1] bg-[#fbfcfb] px-3 py-4 text-xs leading-5 text-[#58615e] sm:flex-row sm:items-center sm:justify-between">
+        <p>বাজার দর — প্রয়োজনীয় পণ্যের দাম এক নজরে।</p>
+        <p>সকল দাম সম্ভাব্য; বাজার অবস্থার ওপর নির্ভর করে পরিবর্তিত হয়।</p>
       </footer>
     </div>
   );
