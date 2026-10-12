@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type HeroSectionProps = {
   dateLabel?: string;
 };
@@ -32,9 +34,15 @@ export default function HeroSection({
 
         <div
           aria-hidden="true"
-          className="flex min-h-36 items-center justify-center rounded-2xl bg-[#edf5ef] px-8 text-7xl sm:min-h-48 sm:min-w-56 sm:text-8xl"
+          className="relative flex min-h-36 items-center justify-center overflow-hidden rounded-2xl bg-[#edf5ef] sm:min-h-48 sm:min-w-56"
         >
-          🧺
+          <Image
+            src="/bazar-hero.png"
+            alt=""
+            width={224}
+            height={192}
+            className="h-36 w-full object-contain sm:h-48 sm:w-56"
+          />
         </div>
       </div>
     </section>

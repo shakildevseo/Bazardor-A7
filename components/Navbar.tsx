@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export type NavItem = {
   slug: string;
@@ -32,9 +33,13 @@ export default function Navbar({
     <header className="w-full border-b border-[#e4e9e4] bg-[#f8faf8]">
       <div className="mx-auto flex min-h-16 w-full max-w-7xl items-center justify-between gap-3 px-4 py-2">
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <span aria-hidden="true" className="text-2xl">
-            🛒
-          </span>
+          <Image
+            src="/logo-icon.png"
+            alt="বাজার দর"
+            width={40}
+            height={40}
+            className="size-10 rounded-lg object-contain"
+          />
           <span>
             <span className="block text-base font-black leading-tight text-[#1b2422]">
               বাজার দর
