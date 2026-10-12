@@ -173,3 +173,10 @@ export function getUnitLabel(unit: string): string {
 
   return unitLabels[unit] ?? unit;
 }
+
+export async function getProductBySlug(
+  slug: string,
+): Promise<BazaarProduct | null> {
+  const products = await getBazaarProducts();
+  return products.find((product) => product.slug === slug) ?? null;
+}
