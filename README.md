@@ -10,7 +10,7 @@
 - TypeScript
 - Tailwind CSS
 - Better Auth (email/password, Google ও GitHub)
-- SQLite (`better-sqlite3`)
+- SQLite locally and PostgreSQL in production (Better Auth)
 - React Hot Toast
 - Programming Hero Bazaar Dor API
 
@@ -36,8 +36,19 @@ pnpm install
 cp .env.example .env.local
 ```
 
-`.env.local`-এ Better Auth secret ও base URL সেট করুন। Google/GitHub sign-in
-চালাতে সংশ্লিষ্ট OAuth client ID ও secret-ও যোগ করুন।
+লোকাল development-এ `DATABASE_URL` ফাঁকা রাখলে auth data `data/`-এর SQLite
+ফাইলে থাকবে। Production-এ Neon Postgres connection string `DATABASE_URL` হিসেবে
+সেট করুন; serverless deployment-এ local SQLite ব্যবহার করা যাবে না। নতুন
+database-এ auth schema তৈরি করতে একবার চালান:
+
+```bash
+pnpm auth:migrate
+```
+
+Vercel-এর Production Environment Variables-এ `DATABASE_URL`,
+`BETTER_AUTH_SECRET` (কমপক্ষে ৩২ অক্ষর) এবং `BETTER_AUTH_URL` যোগ করে redeploy
+করুন। Google/GitHub sign-in চালাতে সংশ্লিষ্ট OAuth client ID ও secret-ও যোগ
+করুন।
 
 ```bash
 pnpm dev

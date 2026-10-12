@@ -2,8 +2,12 @@ import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import Database from "better-sqlite3";
 import { betterAuth } from "better-auth";
+import { Pool } from "pg";
 
 const authSecret = process.env.BETTER_AUTH_SECRET;
+const databaseUrl = process.env.DATABASE_URL?.trim();
+const isProductionBuild =
+  process.env.NEXT_PHASE === "phase-production-build";
 
 if (process.env.NODE_ENV === "production" && !authSecret) {
   throw new Error("BETTER_AUTH_SECRET must be configured in production.");
@@ -13,11 +17,22 @@ if (authSecret && authSecret.length < 32) {
   throw new Error("BETTER_AUTH_SECRET must be at least 32 characters long.");
 }
 
-const dataDirectory = join(process.cwd(), "data");
-mkdirSync(dataDirectory, { recursive: true });
+if (
+  process.env.NODE_ENV === "production" &&
+  !databaseUrl &&
+  !isProductionBuild
+) {
+  throw new Error(
+    "DATABASE_URL must be configured in production. The local SQLite database is not persistent on serverless hosts.",
+  );
+}
 
-const database = new Database(join(dataDirectory, "bazardor-auth.sqlite"));
-database.pragma("journal_mode = WAL");
+const database = databaseUrl
+  ? new Pool({
+      connectionString: databaseUrl,
+      max: process.env.NODE_ENV === "production" ? 1 : 10,
+    })
+  : createLocalDatabase();
 
 export const auth = betterAuth({
   appName: "Bazar Dor",
@@ -51,3 +66,12 @@ export const auth = betterAuth({
     minPasswordLength: 8,
   },
 });
+
+function createLocalDatabase() {
+  const dataDirectory = join(process.cwd(), "data");
+  mkdirSync(dataDirectory, { recursive: true });
+
+  const database = new Database(join(dataDirectory, "bazardor-auth.sqlite"));
+  database.pragma("journal_mode = WAL");
+  return database;
+}
