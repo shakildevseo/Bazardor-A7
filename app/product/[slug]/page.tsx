@@ -36,12 +36,6 @@ async function ProductDetailContent({
   await connection();
 
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
-
-  if (!product) {
-    notFound();
-  }
-
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {
@@ -49,6 +43,12 @@ async function ProductDetailContent({
     redirect(
       `/signin?callbackUrl=${encodeURIComponent(callbackUrl)}&authRequired=1`,
     );
+  }
+
+  const product = await getProductBySlug(slug);
+
+  if (!product) {
+    notFound();
   }
 
   const dateLabel = getBangladeshDateLabel();
