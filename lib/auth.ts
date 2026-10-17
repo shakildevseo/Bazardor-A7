@@ -37,6 +37,12 @@ const database = databaseUrl
 export const auth = betterAuth({
   appName: "Bazar Dor",
   baseURL: process.env.BETTER_AUTH_URL,
+  trustedOrigins: [
+    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
+    ...(process.env.VERCEL_URL
+      ? [`https://${process.env.VERCEL_URL}`]
+      : []),
+  ],
   secret: authSecret,
   database,
   socialProviders: {
