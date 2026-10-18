@@ -60,6 +60,7 @@ export default function SignupForm() {
         name,
         email,
         password,
+        callbackURL: "/",
       });
 
       if (result.error) {
@@ -70,8 +71,15 @@ export default function SignupForm() {
         return;
       }
 
-      showToast("অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে। এখন সাইন ইন করুন।", "success");
-      router.push("/signin");
+      if (!result.data) {
+        const message = "অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।";
+        setErrorMessage(message);
+        showToast(message, "error");
+        return;
+      }
+
+      showToast("অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।", "success");
+      router.push("/");
       router.refresh();
     } catch (error) {
       const message = getErrorMessage(error);

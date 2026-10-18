@@ -1,8 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { connection } from "next/server";
 import Navbar from "@/components/Navbar";
 import PriceTicker from "@/components/PriceTicker";
@@ -13,7 +11,6 @@ import {
   getProductBySlug,
   getUnitLabel,
 } from "@/lib/bazardor";
-import { auth } from "@/lib/auth";
 import type { BazaarProduct } from "@/lib/bazardor";
 
 type ProductDetailPageProps = {
@@ -36,15 +33,6 @@ async function ProductDetailContent({
   await connection();
 
   const { slug } = await params;
-  const session = await auth.api.getSession({ headers: await headers() });
-
-  if (!session) {
-    const callbackUrl = `/product/${encodeURIComponent(slug)}`;
-    redirect(
-      `/signin?callbackUrl=${encodeURIComponent(callbackUrl)}&authRequired=1`,
-    );
-  }
-
   const product = await getProductBySlug(slug);
 
   if (!product) {
@@ -53,18 +41,23 @@ async function ProductDetailContent({
 
   const dateLabel = getBangladeshDateLabel();
   const marketCount = product.markets.length;
-  const lowestPrice = marketCount
-    ? Math.min(...product.markets.map((market) => market.min))
-    : product.today;
-  const highestPrice = marketCount
-    ? Math.max(...product.markets.map((market) => market.max))
-    : product.today;
-  const averagePrice = marketCount
-    ? product.markets.reduce(
-        (total, market) => total + (market.min + market.max) / 2,
-        0,
-      ) / marketCount
-    : product.today;
+  let lowestPrice = product.today;
+  let highestPrice = product.today;
+  let averagePrice = product.today;
+
+  if (marketCount > 0) {
+    lowestPrice = product.markets[0].min;
+    highestPrice = product.markets[0].max;
+    let totalMarketPrice = 0;
+
+    for (const market of product.markets) {
+      lowestPrice = Math.min(lowestPrice, market.min);
+      highestPrice = Math.max(highestPrice, market.max);
+      totalMarketPrice += (market.min + market.max) / 2;
+    }
+
+    averagePrice = totalMarketPrice / marketCount;
+  }
 
   const changeLabel =
     product.change.dir === "up"

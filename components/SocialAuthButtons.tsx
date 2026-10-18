@@ -34,7 +34,8 @@ export default function SocialAuthButtons({
 
       if (result.error) {
         const message =
-          result.error.message ?? "সোশ্যাল সাইন ইন করা যায়নি। আবার চেষ্টা করুন।";
+          result.error.message ??
+          "সোশ্যাল সাইন ইন করা যায়নি। আবার চেষ্টা করুন।";
         setErrorMessage(message);
         showToast(message, "error");
       }
@@ -85,7 +86,6 @@ export default function SocialAuthButtons({
           </svg>
           Google দিয়ে চালিয়ে যান
         </button>
-
         <button
           type="button"
           disabled={isLoading}

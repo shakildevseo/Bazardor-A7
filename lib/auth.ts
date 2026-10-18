@@ -1,83 +1,27 @@
-import { mkdirSync } from "node:fs";
-import { join } from "node:path";
-import Database from "better-sqlite3";
 import { betterAuth } from "better-auth";
-import { Pool } from "pg";
+import { MongoClient } from "mongodb";
+import { mongodbAdapter } from "@better-auth/mongo-adapter";
 
-const authSecret = process.env.BETTER_AUTH_SECRET;
-const databaseUrl = process.env.DATABASE_URL?.trim();
-const isProductionBuild =
-  process.env.NEXT_PHASE === "phase-production-build";
-
-if (process.env.NODE_ENV === "production" && !authSecret) {
-  throw new Error("BETTER_AUTH_SECRET must be configured in production.");
-}
-
-if (authSecret && authSecret.length < 32) {
-  throw new Error("BETTER_AUTH_SECRET must be at least 32 characters long.");
-}
-
-if (
-  process.env.NODE_ENV === "production" &&
-  !databaseUrl &&
-  !isProductionBuild
-) {
-  throw new Error(
-    "DATABASE_URL must be configured in production. The local SQLite database is not persistent on serverless hosts.",
-  );
-}
-
-const database = databaseUrl
-  ? new Pool({
-      connectionString: databaseUrl,
-      max: process.env.NODE_ENV === "production" ? 1 : 10,
-    })
-  : createLocalDatabase();
-
+const client = new MongoClient(process.env.MONGODB_URI as string);
+const db = client.db("bazar-dor-databse");
 export const auth = betterAuth({
-  appName: "Bazar Dor",
-  baseURL: process.env.BETTER_AUTH_URL,
-  trustedOrigins: [
-    ...(process.env.BETTER_AUTH_URL ? [process.env.BETTER_AUTH_URL] : []),
-    ...(process.env.VERCEL_URL
-      ? [`https://${process.env.VERCEL_URL}`]
-      : []),
-  ],
-  secret: authSecret,
-  database,
-  socialProviders: {
-    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-      ? {
-          google: {
-            clientId: process.env.GOOGLE_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            disableImplicitSignUp: true,
-          },
-        }
-      : {}),
-    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
-      ? {
-          github: {
-            clientId: process.env.GITHUB_CLIENT_ID,
-            clientSecret: process.env.GITHUB_CLIENT_SECRET,
-            disableImplicitSignUp: true,
-          },
-        }
-      : {}),
-  },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false,
-    autoSignIn: false,
-    minPasswordLength: 8,
   },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID as string,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+    },
+  },
+
+
+
+  database: mongodbAdapter(db, {
+    client,
+  }),
 });
-
-function createLocalDatabase() {
-  const dataDirectory = join(process.cwd(), "data");
-  mkdirSync(dataDirectory, { recursive: true });
-
-  const database = new Database(join(dataDirectory, "bazardor-auth.sqlite"));
-  database.pragma("journal_mode = WAL");
-  return database;
-}

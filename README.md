@@ -1,16 +1,12 @@
 # বাজার দর | BazarDor
 
-বাংলাদেশের নিত্যপ্রয়োজনীয় পণ্যের বাজারদর এক নজরে দেখুন। পণ্য, বিভাগ ও
-বিভিন্ন বাজারের দাম, দৈনিক পরিবর্তন এবং account features একটি responsive
-বাংলা interface-এ সাজানো হয়েছে।
+বাংলাদেশের নিত্যপ্রয়োজনীয় পণ্যের বাজারদর এক নজরে দেখুন। পণ্য, বিভাগ ও বিভিন্ন বাজারের দাম এবং দৈনিক পরিবর্তন একটি responsive বাংলা interface-এ সাজানো হয়েছে।
 
 ## প্রযুক্তি
 
 - Next.js App Router ও React
 - TypeScript
 - Tailwind CSS
-- Better Auth (email/password, Google ও GitHub)
-- SQLite locally and PostgreSQL in production (Better Auth)
 - React Hot Toast
 - Programming Hero Bazaar Dor API
 
@@ -22,9 +18,7 @@
    grid, category navigation ও numeric price sorting।
 3. **বিস্তারিত বাজার তথ্য:** প্রতিটি পণ্যের সর্বনিম্ন, সর্বোচ্চ ও গড় দাম এবং
    বাজারভিত্তিক price breakdown।
-4. **Authentication ও profile:** Better Auth দিয়ে নিবন্ধন, sign-in, social
-   sign-in, protected profile ও profile name update।
-5. **সব screen-এর উপযোগী UI:** mobile থেকে desktop layout, loading skeleton,
+4. **সব screen-এর উপযোগী UI:** mobile থেকে desktop layout, loading skeleton,
    toast feedback এবং friendly 404 page।
 
 ## চালানো
@@ -33,22 +27,7 @@
 
 ```bash
 pnpm install
-cp .env.example .env.local
 ```
-
-লোকাল development-এ `DATABASE_URL` ফাঁকা রাখলে auth data `data/`-এর SQLite
-ফাইলে থাকবে। Production-এ Neon Postgres connection string `DATABASE_URL` হিসেবে
-সেট করুন; serverless deployment-এ local SQLite ব্যবহার করা যাবে না। নতুন
-database-এ auth schema তৈরি করতে একবার চালান:
-
-```bash
-pnpm auth:migrate
-```
-
-Vercel-এর Production Environment Variables-এ `DATABASE_URL`,
-`BETTER_AUTH_SECRET` (কমপক্ষে ৩২ অক্ষর) এবং `BETTER_AUTH_URL` যোগ করে redeploy
-করুন। Google/GitHub sign-in চালাতে সংশ্লিষ্ট OAuth client ID ও secret-ও যোগ
-করুন।
 
 ```bash
 pnpm dev

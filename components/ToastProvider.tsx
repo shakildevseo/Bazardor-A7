@@ -2,7 +2,6 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
   type ReactNode,
 } from "react";
@@ -17,9 +16,9 @@ type ToastContextValue = {
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const showToast = useCallback((message: string, type: ToastType) => {
+  function showToast(message: string, type: ToastType) {
     toast[type](message, { id: `${type}:${message}` });
-  }, []);
+  }
 
   return (
     <ToastContext.Provider value={{ showToast }}>

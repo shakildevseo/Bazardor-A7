@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import ProductCard, {
   type ProductCardData,
@@ -19,23 +19,17 @@ export default function CategoryProducts({
 }: CategoryProductsProps) {
   const [sortBy, setSortBy] = useState<SortOrder>("default");
 
-  const sortedProducts = useMemo(() => {
-    const sorted = [...products];
+  const sortedProducts = [...products];
 
-    if (sortBy === "price-low") {
-      return sorted.sort(
-        (a, b) => (a.priceValue ?? 0) - (b.priceValue ?? 0),
-      );
-    }
-
-    if (sortBy === "price-high") {
-      return sorted.sort(
-        (a, b) => (b.priceValue ?? 0) - (a.priceValue ?? 0),
-      );
-    }
-
-    return sorted;
-  }, [products, sortBy]);
+  if (sortBy === "price-low") {
+    sortedProducts.sort(
+      (a, b) => (a.priceValue ?? 0) - (b.priceValue ?? 0),
+    );
+  } else if (sortBy === "price-high") {
+    sortedProducts.sort(
+      (a, b) => (b.priceValue ?? 0) - (a.priceValue ?? 0),
+    );
+  }
 
   return (
     <section aria-label="বিভাগের পণ্য" className="mt-5">
@@ -53,7 +47,16 @@ export default function CategoryProducts({
           <span className="relative">
             <select
               value={sortBy}
-              onChange={(event) => setSortBy(event.target.value as SortOrder)}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (
+                  value === "default" ||
+                  value === "price-low" ||
+                  value === "price-high"
+                ) {
+                  setSortBy(value);
+                }
+              }}
               className="min-h-10 appearance-none rounded-lg border border-[#dce4dd] bg-[#fbfcfb] py-2 pl-3 pr-9 text-sm text-[#303a35] outline-none focus:border-[#168d5b] focus:ring-2 focus:ring-[#168d5b]/15"
               aria-label="পণ্যের দাম অনুযায়ী সাজান"
             >

@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { updateUser } from "@/lib/auth-client";
 import { useToast } from "@/components/ToastProvider";
 
 type UpdateProfileFormProps = {
@@ -14,19 +14,25 @@ export default function UpdateProfileForm({
 }: UpdateProfileFormProps) {
   const router = useRouter();
   const showToast = useToast();
-  const [name, setName] = useState(initialName);
+  const [name, setName] = useState(initialName ?? "");
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const updatedName = name.trim();
+    const currentName = name.trim();
+    const originalName = initialName.trim();
 
-    if (updatedName.length < 2) {
+    if (!currentName) {
+      showToast("নাম খালি রাখা যাবে না।", "error");
+      return;
+    }
+
+    if (currentName.length < 2) {
       showToast("নাম অন্তত ২ অক্ষরের হতে হবে।", "error");
       return;
     }
 
-    if (updatedName === initialName) {
+    if (currentName === originalName) {
       showToast("নামে কোনো পরিবর্তন করা হয়নি।", "error");
       return;
     }
@@ -34,9 +40,19 @@ export default function UpdateProfileForm({
     setIsLoading(true);
 
     try {
-      const result = await authClient.updateUser({ name: updatedName });
-      if (result.error) {
-        showToast(result.error.message ?? "তথ্য আপডেট করা যায়নি।", "error");
+      const result = await updateUser({ name: currentName });
+      const errorMessage =
+        result && typeof result === "object" && "error" in result
+          ? (result.error as { message?: string } | undefined)?.message
+          : undefined;
+
+      if (errorMessage || result === null || result === undefined) {
+        showToast(errorMessage ?? "তথ্য আপডেট করা যায়নি।", "error");
+        return;
+      }
+
+      if (result && typeof result === "object" && "status" in result && result.status === false) {
+        showToast("তথ্য আপডেট করা যায়নি।", "error");
         return;
       }
 

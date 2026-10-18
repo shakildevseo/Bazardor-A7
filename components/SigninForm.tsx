@@ -3,7 +3,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { getSafeReturnPath } from "@/lib/safe-return-path";
 import SocialAuthButtons from "@/components/SocialAuthButtons";
 import { useToast } from "@/components/ToastProvider";
 
@@ -16,7 +15,7 @@ function getErrorMessage(error: unknown): string {
 export default function SigninForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = getSafeReturnPath(searchParams.get("callbackUrl"));
+  const callbackUrl = "/";
   const showToast = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(() =>
