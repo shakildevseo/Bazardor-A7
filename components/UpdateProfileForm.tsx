@@ -51,7 +51,12 @@ export default function UpdateProfileForm({
         return;
       }
 
-      if (result && typeof result === "object" && "status" in result && result.status === false) {
+      if (
+        result &&
+        typeof result === "object" &&
+        "status" in result &&
+        result.status === false
+      ) {
         showToast("তথ্য আপডেট করা যায়নি।", "error");
         return;
       }
@@ -72,9 +77,11 @@ export default function UpdateProfileForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="mt-6 space-y-4">
+    <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <label className="block text-sm font-medium text-[#26312d]">
-        নাম
+        <span className="mb-2 block text-base font-semibold text-[#1d2a26]">
+          নাম
+        </span>
         <input
           name="name"
           type="text"
@@ -84,16 +91,16 @@ export default function UpdateProfileForm({
           required
           minLength={2}
           disabled={isLoading}
-          className="mt-1.5 h-11 w-full rounded-lg border border-[#dce4dd] bg-[#fbfcfb] px-3 text-sm outline-none focus:border-[#14915b] focus:ring-2 focus:ring-[#14915b]/15 disabled:opacity-60"
+          className="h-12 w-full rounded-lg border border-[#d6ddd8] bg-[#fbfcfb] px-3 text-base text-[#1d2a26] outline-none transition focus:border-[#14915b] focus:ring-2 focus:ring-[#14915b]/15 disabled:cursor-not-allowed disabled:opacity-60"
         />
       </label>
 
       <button
         type="submit"
         disabled={isLoading}
-        className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#078c4b] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#067b42] disabled:cursor-wait disabled:opacity-70"
+        className="flex min-h-12 w-full items-center justify-center rounded-xl bg-[#078c4b] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#067b42] disabled:cursor-wait disabled:opacity-70"
       >
-        {isLoading ? "আপডেট হচ্ছে..." : "তথ্য আপডেট করুন"}
+        {isLoading ? "আপডেট হচ্ছে..." : "আপডেট করুন"}
       </button>
     </form>
   );

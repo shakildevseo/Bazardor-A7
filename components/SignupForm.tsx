@@ -15,6 +15,7 @@ function getErrorMessage(error: unknown): string {
 export default function SignupForm() {
   const router = useRouter();
   const showToast = useToast();
+  const callbackUrl = "/";
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -60,7 +61,7 @@ export default function SignupForm() {
         name,
         email,
         password,
-        callbackURL: "/",
+        callbackURL: callbackUrl,
       });
 
       if (result.error) {
@@ -79,7 +80,7 @@ export default function SignupForm() {
       }
 
       showToast("অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে।", "success");
-      router.push("/");
+      router.push(callbackUrl);
       router.refresh();
     } catch (error) {
       const message = getErrorMessage(error);
@@ -160,7 +161,7 @@ export default function SignupForm() {
         {isLoading ? "অপেক্ষা করুন..." : "অ্যাকাউন্ট তৈরি করুন"}
       </button>
 
-      <SocialAuthButtons mode="signup" />
+      <SocialAuthButtons mode="signup" callbackURL={callbackUrl} />
     </form>
   );
 }

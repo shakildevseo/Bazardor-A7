@@ -1,9 +1,11 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { connection } from "next/server";
 import Navbar from "@/components/Navbar";
 import PriceTicker from "@/components/PriceTicker";
+import { auth } from "@/lib/auth";
 import {
   formatChangePercent,
   formatTaka,
@@ -33,6 +35,14 @@ async function ProductDetailContent({
   await connection();
 
   const { slug } = await params;
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/signin?authRequired=1");
+  }
+
   const product = await getProductBySlug(slug);
 
   if (!product) {
