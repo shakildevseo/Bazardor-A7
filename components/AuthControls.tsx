@@ -46,7 +46,7 @@ export default function AuthControls() {
           onSuccess: () => {
             setIsMenuOpen(false);
             showToast("সাইন আউট সফল হয়েছে।", "success");
-            router.push("/signin");
+            router.replace("/");
             router.refresh();
           },
         },
